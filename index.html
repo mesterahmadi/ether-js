@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"
+        type="application/javascript"></script>
+</head>
+<body>
+    
+
+    <div style="color: rebeccapurple ; font-size: 20px;" id="app"></div>
+    <hr>
+    <div style="color: rebeccapurple ; font-size: 20px;" id="app2"></div>
+    <hr>
+    <div style="color: rebeccapurple ; font-size: 20px;" id="app5"></div>
+    <hr>
+
+    
+
+<!-- <script src="/me/1-accounts.js"></script>
+<script src="/me/2_read_smart_contract.js"></script> -->
+
+
+<script>
+    
+    // get account------------------------
+    const inforaId = '3bd80b758a304225a2b14448084bcdc5'
+    const provider = new ethers.providers.JsonRpcProvider(`https://rinkeby.infura.io/v3/${inforaId}`)
+
+    const addres = '0xF0335E130Aa4ab3e59e1a9162cfA135DC869B62E'
+
+    const main1 = async ()=> {
+        const balance = await provider.getBalance(addres)
+        app.innerHTML+= `
+        <p> Ether balance: ${addres} : <span style="color: red;"> ${ethers.utils.formatEther(balance)}</span> ETH </p>
+        `
+        console.log(`Ether balance: ${addres}  /br  ${ethers.utils.formatEther(balance)}ETH`);
+
+        }
+    main1()
+
+    //read smart contract--------------------------
+  
+    const ERC20_ABI = [
+        "function name() view returns (string)",
+        "function symbol() view returns (string)",
+        "function totalSupply() view returns (uint256)",
+        "function balanceOf(address) view returns (uint)",
+
+        "event Transfer(address indexed from, address indexed to, uint amount)"
+    ];
+    
+    const address = '0xD8AFa55703A442a127761E5CA897e060Cb3dcb2b' // Petros Contract
+    const contract = new ethers.Contract(address, ERC20_ABI, provider)
+
+    const main2 = async () => {
+        const name = await contract.name()
+        const symbol = await contract.symbol()
+        const totalSupply = await contract.totalSupply()
+        
+        app2.innerHTML+= `
+        <p> addres: ${address}</p>
+        <p> name: ${name}</p>
+        <p> symbol: ${symbol}</p>
+        <p> totlasuply: ${ethers.utils.formatEther(totalSupply)}</p>
+        `
+        
+        console.log("addres:", address);
+        console.log('name:', name);
+        console.log('symbol:', symbol);
+        console.log(`totalsuplay ${totalSupply}`);
+        
+        const balance = await contract.balanceOf("0xe5719d580F3d98ba66b5df4B00436b15F0D934C2")
+        app2.innerHTML+= `
+        <p> balance: ${balance}</p>
+        <p> balance: ${ethers.utils.formatEther(balance)}</p>
+        `
+        console.log(`balance: ${balance}`);
+        console.log(`Balance:${ethers.utils.formatEther(balance)}ETH`);
+    }
+
+    main2()
+
+    //read 3 transaction last ------------------
+
+
+    const main5 = async () => {
+
+        const transfer = await contract.queryFilter('Transfer')
+
+        transfer.reverse()
+
+        const newtr = transfer.splice(0,3)
+        
+        app5.innerHTML+= `
+        <p> lastNumber & Hash:==> ${newtr[0].blockNumber} : ${newtr[0].transactionHash} </p>
+        <p> lastNumber & Hash:==> ${newtr[1].blockNumber} : ${newtr[1].transactionHash} </p>
+        <p> lastNumber & Hash:==> ${newtr[2].blockNumber} : ${newtr[2].transactionHash} </p>
+        `
+        console.log(newtr);
+    }
+    main5()
+
+    
+
+
+
+
+</script>
+</body>
+</html>
